@@ -3,17 +3,41 @@
 # importing the required modules
 import subprocess
 
-def read_journal_logs(lines=50, unit=None, priority=None):
-    cmd = ["journalctl", "--no-pager", "-n", str(lines), "--output=short-precise"]
-    
-    if unit:
-        cmd += ["-u", unit]
-    if priority:
-        cmd += ["-p", priority]
-    
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    return result.stdout
+def realtime_log():
+    process = subprocess.Popen(
+        ["journalctl", "-f"],
+        stdout=subprocess.PIPE,
+        text=True
+    )
 
-print(read_journal_logs(lines=20))
-print(read_journal_logs(unit="sshd.service", lines=10))  
-print(read_journal_logs(priority="err"))
+    for line in process.stdout:
+        print(line.strip())
+
+def error_log():
+    process = subprocess.run(
+        ["journallctl", ]
+
+
+    )
+
+def time_log():
+    time_input = input("")
+    process = subprocess.run(
+        ["journalctl", "--since", f"{time_input} ago"],
+        capture_output=True,
+        text=True      
+    )
+    return process.stdout
+
+def live_errors():
+    process = subprocess.Popen(
+        ["journalctl", "-f", "-p", "err"],
+        stdout=subprocess.PIPE,
+        text=True
+    )
+
+    for line in process.stdout:
+        print("ERROR >", line.strip())
+
+live_errors()        
+
