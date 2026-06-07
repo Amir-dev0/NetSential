@@ -2,31 +2,61 @@
 
 # importing the required modules
 import nmap
+class PortScanner:
 
-#recieve the begin and end port and IP target
-begin = int(input("Enter the begining port: "))
-end = int(input("Enter the ending port: "))
-target = input("inter the ip target: ")
+    def __init__(self, target):
+        self.target = target
+        self.scanner = nmap.PortScanner()
 
-# instantiate a PortScanner object
-scanner = nmap.PortScanner()
+    def scan_single_port(self, port):
+        res = self.scanner.scan(
+            self.target,
+            str(port)
+        )
 
-is_open = False
-opens = []
-count = 0
-for i in range(begin, end+1):
+        state = res['scan'][self.target]['tcp'][port]['state']
 
-    #scan teh target port
-    res = scanner.scan(target,str(i))
+        if state == 'open':
+            print(f"port {port} is open")
+        else:
+            print(f"port {port} is closed")
+
+        return state
+
+    def scan_range(self, begin, end):
+        
+        is_open = False
+        open_ports = []
+
+        
+        for port in range(begin, end + 1):
+
+            res = self.scanner.scan(
+                self.target,
+                str(port)
+            )
+
+            state = res['scan'][self.target]['tcp'][port]['state']
+
+            if state == "open":
+                open_ports.append(port)
+                is_open = True
+
+        if not is_open:
+            print("all ports are closed")
+        else:
+            print(f"{len(open_ports)} port(s) are open: {open_ports}")  
+  
+target = input("Enter your target: ")
+scanner = PortScanner(target)
+model = int(input("1) single scan port \n 2) range scan port \n ->  "))
+
+if model == 1:
+    port = int(input("Enter the port you want to scan: "))
+    scanner.scan_single_port(port)
     
-    res = res['scan'][target]['tcp'][i]['state']
-    
-    if res == 'open':
-        opens.append(i)
-        is_open = True
-        count += 1
+elif model == 2:
+    begin = int(input("Enter the begining port: "))
+    end   = int(input("Enter the ending port: "))
 
-if not is_open:
-    print('all port is closed')      
-if count > 0:
-    print(f"{count} port is open and these is {opens}")
+    scanner.scan_range(begin, end)    
