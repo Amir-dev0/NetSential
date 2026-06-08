@@ -7,7 +7,8 @@ import psutil
 class cpu():
     def __init__(self):
         pass
-
+    
+    @staticmethod
     def number_of_core():
         number_of_cores = psutil.cpu_count()
         return number_of_cores
@@ -83,3 +84,6 @@ class battery():
     def percent_battery(self):
         percent_battery = self.battery.percent
         return percent_battery
+disk_usage = psutil.disk_usage('/home')
+print(disk_usage)
+print(str(disk_usage[3]) + "%")    
