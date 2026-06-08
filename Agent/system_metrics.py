@@ -36,7 +36,7 @@ class ram():
     
     def percent_ram_used(self):
         percent_ram_used = str(self.all_ram[2]) + '%'
-        return percent_battery
+        return percent_ram_used
 
     def total_swap(self):
         total_swap = str(int(self.all_swap[0] / 10**9)) + 'Gb'
@@ -70,15 +70,16 @@ class disk():
 class temperature():
     def __init__(self):
         self.temperature = psutil.sensors_temperatures()
-
+        
     def cpu_temperature(self):
         cpu_temperature = self.temperature['acpitz'][0].current
-
+        return cpu_temperature
+    
 #receive battery information
 class battery():
     def __init__(self):
-        pass
-battery = psutil.sensors_battery()
-percent_battery = battery.percent
+        self.battery = psutil.sensors_battery()
 
-print(battery)
+    def percent_battery(self):
+        percent_battery = self.battery.percent
+        return percent_battery
