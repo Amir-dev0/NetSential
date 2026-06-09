@@ -7,6 +7,7 @@ class LogParse():
         pass
     
     # This function receives and shows the logs momentarily
+    @staticmethod
     def realtime_log():
         process = subprocess.Popen(
             ["journalctl", "-f"],
@@ -15,21 +16,27 @@ class LogParse():
         )
 
         for line in process.stdout:
-            print(line.strip())
+            yield line.strip()
 
     # This function shows error logs
+    @staticmethod
     def error_logs():
-        process = subprocess.run(
-            ["journalctl", "-p", "err"],
-            capture_output=True,
-            text=True
-        )
+        try:
+            process = subprocess.run(
+                ["journalctl", "-p", "err"],
+                capture_output=True,
+                text=True
+            )
+            if process.returncode != 0:
+                return f"Error: {process.stderr}"
 
-        return process.stdout
+            return process.stdout
+        except FileNotFoundError:
+            return "journalctl not found -- is this a systemd system ? "
 
     # This function shows the logs from the time you give it until now
-    def time_log():
-        time_input = input("")
+    @staticmethod
+    def logs_from(time_input: str):
         process = subprocess.run(
             ["journalctl", "--since", f"{time_input} ago"],
             capture_output=True,
@@ -38,6 +45,7 @@ class LogParse():
         return process.stdout
 
     # This function shows the errors in real time
+    @staticmethod
     def live_errors():
         process = subprocess.Popen(
             ["journalctl", "-f", "-p", "err"],
@@ -46,9 +54,10 @@ class LogParse():
             )
 
         for line in process.stdout:
-            print("ERROR >", line.strip())
+            yield line.strip()
 
     # This function shows boot errors
+    @staticmethod
     def boot_errors():
         process = subprocess.run(
             ["journalctl", "-b", "-p", "err"],
