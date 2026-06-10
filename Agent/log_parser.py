@@ -3,8 +3,6 @@
 # importing the required modules
 import subprocess
 class LogParse():
-    def __init__(self):
-        pass
     
     # This function receives and shows the logs momentarily
     @staticmethod

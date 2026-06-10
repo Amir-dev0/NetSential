@@ -65,7 +65,7 @@ class disk():
         return free_disk
 
     def percent_disk_used(self):
-        percent_disk_used = str(int(self.disk_usage[3] / 10**9)) + 'Gb'
+        percent_disk_used = str(self.disk_usage[3]) + "%"
         return percent_disk_used
 #receive temperature
 class temperature():
@@ -73,6 +73,8 @@ class temperature():
         self.temperature = psutil.sensors_temperatures()
         
     def cpu_temperature(self):
+        if not self.temperature or 'acpitz' not in self.temperature:
+            return None
         cpu_temperature = self.temperature['acpitz'][0].current
         return cpu_temperature
     
@@ -84,6 +86,3 @@ class battery():
     def percent_battery(self):
         percent_battery = self.battery.percent
         return percent_battery
-disk_usage = psutil.disk_usage('/home')
-print(disk_usage)
-print(str(disk_usage[3]) + "%")    

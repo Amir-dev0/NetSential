@@ -1,20 +1,42 @@
-# importing the required modules
 import sqlite3
 from pathlib import Path
 
-# path database.db
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 DB_PATH = BASE_DIR / "data" / "database.db"
 
-# connecting to database
-conn = sqlite3.connect(DB_PATH)
 
-# creating  curser
-cursor = conn.cursor()
+class Database:
 
-cursor.execute("DROP TABLE IF EXISTS users")
+    def __init__(self):
+        self.conn = sqlite3.connect(DB_PATH)
+        self.cursor = self.conn.cursor()
 
-conn.commit()
-conn.close()
+    def create_table(self):
 
-print("Table deleted!")
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS scanned_ports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            target TEXT,
+            port INTEGER,
+            status TEXT
+        )
+        """)
+
+        self.conn.commit()
+
+    def save_scan(self, target, port, status):
+
+        self.cursor.execute("""
+        INSERT INTO scanned_ports (
+            target,
+            port,
+            status
+        )
+        VALUES (?, ?, ?)
+        """, (target, port, status))
+
+        self.conn.commit()
+
+    def close(self):
+        self.conn.close()
