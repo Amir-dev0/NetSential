@@ -40,3 +40,74 @@ class Database:
 
     def close(self):
         self.conn.close()
+
+    def create_metric_table(self):
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS system_metrics (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cpu_percent REAL,
+        cpu_cores INTEGER,
+
+        total_ram TEXT,
+        used_ram TEXT,
+        free_ram TEXT,
+        ram_percent TEXT,
+
+        total_disk TEXT,
+        used_disk TEXT,
+        free_disk TEXT,
+        disk_percent TEXT,
+
+        cpu_temperature REAL,
+
+        battery_percent REAL,
+
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+
+        self.conn.commit()
+
+    def save_system_metrics(self, metrics):
+
+        self.cursor.execute("""
+        INSERT INTO system_metrics (
+            cpu_percent,
+            cpu_cores,
+
+            total_ram,
+            used_ram,
+            free_ram,
+            ram_percent,
+
+            total_disk,
+            used_disk,
+            free_disk,
+            disk_percent,
+
+            cpu_temperature,
+
+            battery_percent
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+
+            metrics["cpu_percent"],
+            metrics["cpu_cores"],
+
+            metrics["total_ram"],
+            metrics["used_ram"],
+            metrics["free_ram"],
+            metrics["ram_percent"],
+
+            metrics["total_disk"],
+            metrics["used_disk"],
+            metrics["free_disk"],
+            metrics["disk_percent"],
+
+            metrics["cpu_temperature"],
+
+            metrics["battery_percent"]
+        ))
+
+        self.conn.commit()    
