@@ -86,3 +86,75 @@ class battery():
     def percent_battery(self):
         percent_battery = self.battery.percent
         return percent_battery
+    
+    def collect_system_metrics():
+
+        cpu_obj = cpu()
+        ram_obj = ram()
+        disk_obj = disk()
+        temp_obj = temperature()
+        battery_obj = battery()
+
+        metrics = {
+
+            "cpu_cores": cpu_obj.number_of_core(),
+            "cpu_percent": cpu.cpu_percent(),
+
+            "total_ram": ram_obj.total_ram(),
+            "used_ram": ram_obj.used_ram(),
+            "free_ram": ram_obj.free_ram(),
+            "ram_percent": ram_obj.percent_ram_used(),
+
+            "total_disk": disk_obj.total_disk(),
+            "used_disk": disk_obj.used_disk(),
+            "free_disk": disk_obj.free_disk(),
+            "disk_percent": disk_obj.percent_disk_used(),
+
+            "cpu_temperature": temp_obj.cpu_temperature(),
+
+            "battery_percent": battery_obj.percent_battery()
+        }
+
+        return metrics
+    
+import psutil
+
+
+class SystemMetrics:
+
+    def __init__(self):
+        self.ram = psutil.virtual_memory()
+        self.swap = psutil.swap_memory()
+        self.disk = psutil.disk_usage('/home')
+        self.temp = psutil.sensors_temperatures()
+        self.battery = psutil.sensors_battery()
+
+    def collect_metrics(self):
+
+        cpu_temperature = None
+
+        if self.temp and 'acpitz' in self.temp:
+            cpu_temperature = self.temp['acpitz'][0].current
+
+        metrics = {
+            "cpu_cores": psutil.cpu_count(),
+            "cpu_percent": psutil.cpu_percent(),
+
+            "total_ram": round(self.ram.total / 10**9, 2),
+            "used_ram": round(self.ram.used / 10**9, 2),
+            "free_ram": round(self.ram.available / 10**9, 2),
+            "ram_percent": self.ram.percent,
+
+            "total_disk": round(self.disk.total / 10**9, 2),
+            "used_disk": round(self.disk.used / 10**9, 2),
+            "free_disk": round(self.disk.free / 10**9, 2),
+            "disk_percent": self.disk.percent,
+
+            "cpu_temperature": cpu_temperature,
+
+            "battery_percent":
+                self.battery.percent
+                if self.battery else None
+        }
+
+        return metrics    
