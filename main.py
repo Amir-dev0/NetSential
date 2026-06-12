@@ -1,5 +1,6 @@
-from Agent.port_scanner import PortScanner
 from Backend.database import Database
+from Agent.port_scanner import PortScanner
+from Agent.system_metrics import SystemMetrics
 
 
 db = Database()
@@ -45,5 +46,17 @@ elif mode == 2:
         )
 
     print(results)
+
+#db.close()
+
+db.create_metric_table()
+
+metrics_agent = SystemMetrics()
+
+metrics = metrics_agent.collect_metrics()
+
+db.save_system_metrics(metrics)
+
+print(metrics)
 
 db.close()
