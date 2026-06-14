@@ -38,8 +38,6 @@ class Database:
 
         self.conn.commit()
 
-    def close(self):
-        self.conn.close()
 
     def create_metric_table(self):
         self.cursor.execute("""
@@ -110,4 +108,52 @@ class Database:
             metrics["battery_percent"]
         ))
 
-        self.conn.commit()    
+        self.conn.commit()
+
+    def create_users_table(self):
+
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL
+        )
+        """)
+
+        self.conn.commit()
+
+
+    def create_user(self, username, password_hash):
+
+        self.cursor.execute("""
+        INSERT INTO users (
+            username,
+            password_hash
+        )
+        VALUES (?, ?)
+        """, (username, password_hash))
+
+        self.conn.commit()
+
+
+    def get_user(self, username):
+
+        self.cursor.execute("""
+        SELECT username, password_hash
+        FROM users
+        WHERE username = ?
+        """, (username,))   
+
+        return self.cursor.fetchone()    
+
+    def count_users(self):
+
+        self.cursor.execute("""
+        SELECT COUNT(*)
+        FROM users
+        """)
+
+        return self.cursor.fetchone()[0]
+
+    def close(self):
+        self.conn.close()
