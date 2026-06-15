@@ -1,26 +1,30 @@
 # this module must scan server's port
 
 # importing the required modules
-import nmap
+import socket
 class PortScanner:
 
     def __init__(self, target):
         self.target = target
-        self.scanner = nmap.PortScanner()
 
     def scan_single_port(self, port):
 
-        res = self.scanner.scan(
-            self.target,
-            str(port)
-        )
+        sock = socket.socket()
+        sock.settimeout(1)
 
-        state = res['scan'][self.target]['tcp'][port]['state']
+        try:
+            sock.connect((self.target, port))
+        except OSError:
+            status = "closed"
+        else:
+            status = "open"
+        finally:
+            sock.close()
 
         return {
             "target": self.target,
             "port": port,
-            "status": state
+            "status": status
         }
 
     def scan_range(self, begin, end):
@@ -29,17 +33,8 @@ class PortScanner:
 
         for port in range(begin, end + 1):
 
-            res = self.scanner.scan(
-                self.target,
-                str(port)
-            )
+            result = self.scan_single_port(port)
 
-            state = res['scan'][self.target]['tcp'][port]['state']
-
-            results.append({
-                "target": self.target,
-                "port": port,
-                "status": state
-            })
+            results.append(result)
 
         return results
